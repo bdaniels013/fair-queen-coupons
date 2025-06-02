@@ -99,8 +99,15 @@
             font-style: italic;
             opacity: 0.9;
         }
-        .signature {
+        .signature-container {
             margin-top: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 20px;
+            page-break-inside: avoid;
+        }
+        .signature {
             text-align: right;
             font-family: 'Dancing Script', cursive;
             font-size: 24px;
@@ -111,7 +118,6 @@
             background: linear-gradient(45deg, rgba(255, 182, 193, 0.2), rgba(255, 255, 255, 0.5));
             border-radius: 8px;
             max-width: 400px;
-            margin-left: auto;
         }
         .signature p {
             margin: 0;
@@ -135,6 +141,18 @@
             font-size: 24px;
             color: #ff69b4;
             animation: pulse 2s infinite;
+        }
+        .signature-image {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border: 2px solid #ff69b4;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease;
+        }
+        .signature-image:hover {
+            transform: scale(1.1);
         }
         @keyframes pulse {
             0%, 100% { transform: scale(1); opacity: 0.8; }
@@ -243,6 +261,10 @@
             .signature::after {
                 animation: none;
             }
+            .signature-image {
+                box-shadow: none;
+                border: 1px solid #ff69b4;
+            }
             #couponModal, #modalContent {
                 display: none !important;
             }
@@ -267,6 +289,10 @@
             .coupon::before, .coupon::after {
                 font-size: 20px;
             }
+            .signature-container {
+                flex-direction: column;
+                align-items: flex-end;
+            }
             .signature {
                 font-size: 20px;
                 max-width: 100%;
@@ -274,6 +300,10 @@
             }
             .signature::before, .signature::after {
                 font-size: 20px;
+            }
+            .signature-image {
+                width: 60px;
+                height: 60px;
             }
             #modalContent {
                 transform: scale(1.2);
@@ -455,9 +485,12 @@
             <p>Redeem for a month where I bring home fresh flowers weekly, chosen with Nora, to brighten your fairy queen sanctuary.</p>
             <div class="coupon-footer">Valid for a month of beauty!</div>
         </div>
-        <div class="signature">
-            <p>From, Blakey the Spaceship</p>
-            <p>I love you! Happy Birthday!!</p>
+        <div class="signature-container">
+            <img src="blake-megan.png" alt="Blake and Megan" class="signature-image">
+            <div class="signature">
+                <p>From, Blakey the Spaceship</p>
+                <p>I love you! Happy Birthday!!</p>
+            </div>
         </div>
         <div id="couponModal">
             <div id="modalContent"></div>
