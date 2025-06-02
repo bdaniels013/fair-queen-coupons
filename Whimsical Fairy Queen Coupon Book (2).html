@@ -1,0 +1,402 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Whimsical Fairy Queen Coupon Book</title>
+    <style>
+        body {
+            font-family: 'Lora', serif;
+            background: #fff; /* White background for print */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .coupon-book {
+            max-width: 750px;
+            background: #fff;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+            border: 2px solid #ff69b4;
+        }
+        h1 {
+            font-family: 'Dancing Script', cursive;
+            color: #1e3a8a;
+            font-size: 36px;
+            margin-bottom: 20px;
+            line-height: 1.3;
+        }
+        .coupon {
+            border: 4px dashed #ff69b4;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 15px 0;
+            text-align: left;
+            position: relative;
+            min-height: 100px;
+            background: linear-gradient(135deg, #ff69b4 0%, #ff99cc 30%, #c71585 60%, #ffb6c1 100%),
+                        radial-gradient(circle at 10% 10%, rgba(255, 255, 255, 0.4), transparent 40%),
+                        radial-gradient(circle at 90% 90%, rgba(255, 182, 193, 0.4), transparent 40%),
+                        url('https://www.transparenttextures.com/patterns/psychedelic-pattern.png');
+            background-size: 100px, 100%, 100%, 100px;
+            background-blend-mode: overlay, normal, normal, screen;
+            page-break-inside: avoid;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .coupon h2 {
+            font-family: 'Dancing Script', cursive;
+            font-size: 24px;
+            color: #1e3a8a;
+            margin: 0 0 10px;
+            letter-spacing: 1.2px;
+            position: relative;
+        }
+        .coupon h2::after {
+            content: '';
+            position: absolute;
+            bottom: -3px;
+            left: 0;
+            width: 50%;
+            height: 2px;
+            background: linear-gradient(to right, #ff69b4, transparent);
+        }
+        .coupon p {
+            font-size: 14px;
+            color: #1a202c;
+            margin: 0;
+            line-height: 1.4;
+        }
+        .coupon::before {
+            content: '🪸';
+            position: absolute;
+            left: -15px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 24px;
+            color: #ff69b4;
+        }
+        .coupon::after {
+            content: '✨';
+            position: absolute;
+            right: -15px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 24px;
+            color: #ff69b4;
+        }
+        .coupon-footer {
+            font-size: 12px;
+            color: #4a5568;
+            margin-top: 10px;
+            font-style: italic;
+            opacity: 0.9;
+        }
+        @media screen {
+            body {
+                background: linear-gradient(135deg, #4b6cb7, #89cff0, #a8e063);
+            }
+            .coupon-book {
+                box-shadow: 0 10px 20px rgba(0, 0, 0, 0.25), 0 0 30px rgba(255, 255, 255, 0.7);
+                background: rgba(255, 255, 255, 0.98);
+            }
+            .coupon-book::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: url('https://www.transparenttextures.com/patterns/glitter.png'), linear-gradient(45deg, rgba(255, 182, 193, 0.2), rgba(255, 255, 255, 0.3));
+                opacity: 0.4;
+                z-index: 0;
+            }
+            .coupon {
+                transition: transform 0.3s ease, box-shadow 0.3s ease;
+                box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2), 0 0 20px rgba(255, 182, 193, 0.5);
+            }
+            .coupon:hover {
+                transform: scale(1.05);
+                box-shadow: 0 12px 25px rgba(0, 0, 0, 0.3), 0 0 25px #ff69b4;
+            }
+            .sparkle {
+                position: absolute;
+                width: 12px;
+                height: 12px;
+                background: radial-gradient(circle, #ff69b4, transparent);
+                border-radius: 50%;
+                animation: sparkle 2s infinite ease-in-out;
+                z-index: 1;
+            }
+            @keyframes sparkle {
+                0%, 100% { opacity: 0; transform: scale(0.5); }
+                50% { opacity: 1; transform: scale(1.3); }
+            }
+            .sparkle:nth-child(1) { top: 10%; left: 15%; animation-delay: 0s; }
+            .sparkle:nth-child(2) { top: 20%; left: 80%; animation-delay: 0.5s; }
+            .sparkle:nth-child(3) { top: 70%; left: 10%; animation-delay: 1s; }
+            .sparkle:nth-child(4) { top: 50%; left: 90%; animation-delay: 1.5s; }
+        }
+        @media print {
+            body {
+                background: none;
+                padding: 0;
+            }
+            .coupon-book {
+                box-shadow: none;
+                background: #fff;
+                border: none;
+            }
+            .coupon-book::before {
+                display: none;
+            }
+            .coupon {
+                box-shadow: none;
+                border: 3px dashed #ff69b4;
+                margin: 10px 0;
+                transform: none !important;
+            }
+            .sparkle {
+                display: none;
+            }
+            @page {
+                margin: 0.5in;
+            }
+        }
+        @media (max-width: 600px) {
+            .coupon-book {
+                padding: 15px;
+                max-width: 90%;
+            }
+            h1 {
+                font-size: 28px;
+            }
+            .coupon h2 {
+                font-size: 20px;
+            }
+            .coupon p {
+                font-size: 12px;
+            }
+            .coupon::before, .coupon::after {
+                font-size: 20px;
+            }
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&family=Lora:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="coupon-book">
+        <h1>My Fairy Queen, Happy Birthday! - Your Enchanted Coupon Book</h1>
+        <div class="coupon">
+            <h2>Serene Sunset Picnic</h2>
+            <p>Redeem for a romantic evening picnic by the water, with your favorite treats, a cozy blanket, and a sunset view to make your heart soar.</p>
+            <div class="coupon-footer">Valid any evening this summer!</div>
+        </div>
+        <div class="coupon">
+            <h2>Bedroom Sanctuary Upgrade</h2>
+            <p>Redeem for a home improvement project to refresh our bedroom with new linens, candles, and decor to create your perfect fairy-tale retreat.</p>
+            <div class="coupon-footer">Yours to claim this season!</div>
+        </div>
+        <div class="coupon">
+            <h2>Gourmet Dessert Night</h2>
+            <p>Redeem for an evening where I bake or buy your dream dessert, served with wine and soft music to indulge your sweet, magical soul.</p>
+            <div class="coupon-footer">Valid whenever you crave sweetness!</div>
+        </div>
+        <div class="coupon">
+            <h2>Errand-Free Day</h2>
+            <p>Redeem for a day where I handle all your errands—groceries, post office, or anything else—so you can glide through your day carefree.</p>
+            <div class="coupon-footer">Use anytime you need freedom!</div>
+        </div>
+        <div class="coupon">
+            <h2>Enchanted Flower Garden Day</h2>
+            <p>Redeem for a day of planting your favorite flowers in our garden, with me as your helper, creating a vibrant oasis for your fairy spirit to bloom.</p>
+            <div class="coupon-footer">Valid for a day of beauty!</div>
+        </div>
+        <div class="coupon">
+            <h2>Seaside Memory Scrapbook</h2>
+            <p>Redeem for a custom scrapbook I’ll create, filled with photos and mementos of our happiest moments, to treasure like a mermaid’s keepsake.</p>
+            <div class="coupon-footer">Yours to enjoy anytime!</div>
+        </div>
+        <div class="coupon">
+            <h2>Podcast Studio Transformation</h2>
+            <p>Redeem for a home improvement project to transform our music room into your dream podcast studio, with cozy decor and tech to amplify your voice.</p>
+            <div class="coupon-footer">Valid to spark your creativity!</div>
+        </div>
+        <div class="coupon">
+            <h2>Storage Unit Declutter Trip</h2>
+            <p>Redeem for a day where I take items from our home to a storage unit, decluttering your space so you can float freely in a serene, tidy haven.</p>
+            <div class="coupon-footer">Valid anytime for peace of mind!</div>
+        </div>
+        <div class="coupon">
+            <h2>Blinds Installation Bliss</h2>
+            <p>Redeem for a home improvement project where I hang new blinds in your favorite room, adding elegance and comfort to your enchanted sanctuary.</p>
+            <div class="coupon-footer">Valid to brighten your space!</div>
+        </div>
+        <div class="coupon">
+            <h2>Mermaid Jewel Crafting</h2>
+            <p>Redeem for a day where we create a piece of jewelry together, inspired by the sea, to adorn your radiant spirit with a sparkling treasure.</p>
+            <div class="coupon-footer">Valid for a day of creativity!</div>
+        </div>
+        <div class="coupon">
+            <h2>Fairy-Tale Movie Marathon</h2>
+            <p>Redeem for a cozy movie night with your favorite films, complete with popcorn, blankets, and fairy lights to transport you to a magical world.</p>
+            <div class="coupon-footer">Valid for a night of enchantment!</div>
+        </div>
+        <div class="coupon">
+            <h2>Wardrobe Organization Glow</h2>
+            <p>Redeem for a day where I organize your wardrobe, neatly arranging your dresses and accessories to make your mornings feel like a fairy’s breeze.</p>
+            <div class="coupon-footer">Valid anytime for ease and sparkle!</div>
+        </div>
+        <div class="coupon">
+            <h2>Custom Candle-Making Magic</h2>
+            <p>Redeem for a day where we craft scented candles with your favorite fragrances, filling our home with a glow as warm as your fairy heart.</p>
+            <div class="coupon-footer">Valid for a day of cozy creation!</div>
+        </div>
+        <div class="coupon">
+            <h2>Family Art Day Extravaganza</h2>
+            <p>Redeem for a day where Neilson, Nora, Knox, and I set up an art station to create a giant canvas painting for you, filled with love and their colorful touches.</p>
+            <div class="coupon-footer">Valid for a day of family fun!</div>
+        </div>
+        <div class="coupon">
+            <h2>Kids-Led Breakfast Surprise</h2>
+            <p>Redeem for a morning where Neilson, Nora, and Knox, with my help, prepare a special breakfast for you, served with handmade cards to warm your heart.</p>
+            <div class="coupon-footer">Valid any weekend morning!</div>
+        </div>
+        <div class="coupon">
+            <h2>Family Beach Adventure</h2>
+            <p>Redeem for a day at the beach with Neilson, Nora, Knox, and me, building sandcastles and hunting for shells to make you feel like a true fairy queen.</p>
+            <div class="coupon-footer">Valid for a sunny day escape!</div>
+        </div>
+        <div class="coupon">
+            <h2>Storytelling Night with Kids</h2>
+            <p>Redeem for an evening where Neilson, Nora, Knox, and I take turns telling stories or acting out a play for you, under a cozy tent with fairy lights.</p>
+            <div class="coupon-footer">Valid for a night of imagination!</div>
+        </div>
+        <div class="coupon">
+            <h2>Gourmet Dinner Night Off</h2>
+            <p>Redeem for an evening where I cook a delicious dinner of your favorite dishes, so you can relax and enjoy a night off from the kitchen, served with love.</p>
+            <div class="coupon-footer">Valid any evening you need a break!</div>
+        </div>
+        <div class="coupon">
+            <h2>Family Talent Show Night</h2>
+            <p>Redeem for an evening where Neilson, Nora, Knox, and I perform a talent show for you, with songs, dances, or skits to make you smile like a fairy queen.</p>
+            <div class="coupon-footer">Valid for a night of family laughter!</div>
+        </div>
+        <div class="coupon">
+            <h2>Personalized Playlist Creation</h2>
+            <p>Redeem for a custom playlist I’ll curate with Neilson’s help, featuring songs that capture your free-spirited heart, perfect for your fairy dance moments.</p>
+            <div class="coupon-footer">Valid to enjoy anytime!</div>
+        </div>
+        <div class="coupon">
+            <h2>Raised Garden Bed Revival</h2>
+            <p>Redeem for a day where I set up our three raised garden beds with rich soil and your favorite plants, with Nora and Knox adding decorative stones, to create your dream garden.</p>
+            <div class="coupon-footer">Valid to bloom your outdoor oasis!</div>
+        </div>
+        <div class="coupon">
+            <h2>Yard Clean-Up Magic</h2>
+            <p>Redeem for a day where I clean up the yard—mowing, raking, and tidying—so you can enjoy a pristine outdoor haven, with Neilson helping to make it sparkle.</p>
+            <div class="coupon-footer">Valid for a day of serene beauty!</div>
+        </div>
+        <div class="coupon">
+            <h2>Luxury Spa Day at Home</h2>
+            <p>Redeem for a day of pampering with a home spa setup, including a bubble bath, facial, and massage, to make you feel like royalty.</p>
+            <div class="coupon-footer">Valid for a day of relaxation!</div>
+        </div>
+        <div class="coupon">
+            <h2>Family Game Night Royale</h2>
+            <p>Redeem for an evening of board games or card games with Neilson, Nora, Knox, and me, complete with snacks and laughter to warm your heart.</p>
+            <div class="coupon-footer">Valid for a night of fun!</div>
+        </div>
+        <div class="coupon">
+            <h2>Patio Fairy Lights Glow</h2>
+            <p>Redeem for a home improvement project where I install fairy lights on our patio, creating a magical evening ambiance, with Nora adding decorative touches.</p>
+            <div class="coupon-footer">Valid to enchant your evenings!</div>
+        </div>
+        <div class="coupon">
+            <h2>Kids’ Chore Takeover</h2>
+            <p>Redeem for a day where Neilson, Nora, Knox, and I take over all kid-related chores—laundry, toy cleanup, and more—so you can relax.</p>
+            <div class="coupon-footer">Valid for a stress-free day!</div>
+        </div>
+        <div class="coupon">
+            <h2>Custom Fairy Tale Writing</h2>
+            <p>Redeem for a personalized fairy tale written by me, starring you as the queen, with illustrations by Neilson and Nora, to treasure forever.</p>
+            <div class="coupon-footer">Valid for a magical keepsake!</div>
+        </div>
+        <div class="coupon">
+            <h2>Family Picnic in the Garden</h2>
+            <p>Redeem for a family picnic in our garden with Neilson, Nora, Knox, and me, featuring your favorite foods and games near the raised beds.</p>
+            <div class="coupon-footer">Valid for a sunny afternoon!</div>
+        </div>
+        <div class="coupon">
+            <h2>Wall Art Installation Charm</h2>
+            <p>Redeem for a home improvement project where I hang new wall art or family photos in your favorite room, enhancing your fairy-tale home.</p>
+            <div class="coupon-footer">Valid to beautify your space!</div>
+        </div>
+        <div class="coupon">
+            <h2>Car Wash and Detail Shine</h2>
+            <p>Redeem for a day where I wash and detail your car, with Neilson helping to polish, so you can drive in sparkling style.</p>
+            <div class="coupon-footer">Valid for a clean getaway!</div>
+        </div>
+        <div class="coupon">
+            <h2>Kids’ Craft Day for You</h2>
+            <p>Redeem for a day where Neilson, Nora, and Knox create handmade gifts for you—cards, bookmarks, or trinkets—with my guidance.</p>
+            <div class="coupon-footer">Valid for a day of love!</div>
+        </div>
+        <div class="coupon">
+            <h2>Cozy Blanket Fort Night</h2>
+            <p>Redeem for an evening where Neilson, Nora, Knox, and I build a blanket fort for you, filled with pillows and fairy lights for a magical night.</p>
+            <div class="coupon-footer">Valid for a cozy adventure!</div>
+        </div>
+        <div class="coupon">
+            <h2>Weekly Flower Delivery</h2>
+            <p>Redeem for a month where I bring home fresh flowers weekly, chosen with Nora, to brighten your fairy queen sanctuary.</p>
+            <div class="coupon-footer">Valid for a month of beauty!</div>
+        </div>
+    </div>
+</body>
+</html>
